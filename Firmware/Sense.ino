@@ -47,4 +47,3 @@ void loop() {
   protothreadSlider(&pt3);
   protothreadRGB(&pt4);
 }
-s
