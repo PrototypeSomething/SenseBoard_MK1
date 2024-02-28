@@ -10,8 +10,9 @@ bool rgb = false;                     //  Enables RGB
 int capsColor[3] = {255, 255, 0};     //  Color Caps lock highlights when caps is activated
 const int numberOfSwitches = 44;      //  Total number of switches to read, starting from switch 0 (left Windows)
 
-static struct pt pt1, pt2, pt3, pt4;
+static struct pt pt1, pt2, pt3, pt4;  // declares "threads" from the protothread library, which sort of emulates threads to make "multitasking" manageable on single core platforms like the Nordic-nRF52840 (1C 1T 64MHz)
 
+// includes neccesary header files is correct order
 #include "Values.h"
 #include "Keymaps.h"
 #include "LightingEffects.h"
@@ -20,30 +21,26 @@ static struct pt pt1, pt2, pt3, pt4;
 #include "switchThread.h"
 #include "extrasThread.h"
 
-void setup() {
+void setup() {  // sets up neccecary values such as inputs and declares neccecary values for libraries
   pinMode(6, OUTPUT);
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
-  PT_INIT(&pt1);
+  PT_INIT(&pt1);  // initialises the virtual threads
   PT_INIT(&pt2);
-  startRGB();
-  startSlider(sliderFunction);
-  bluemicro_hid.setBLEModel("SenseBoard_MK0.7");
-  bluemicro_hid.setHIDMessageDelay(10);
-  bluemicro_hid.begin();
-  // Keyboard.begin();
-  // if (debug) {
-  //   Serial.begin(115200);
-  //   delay(5000);
-  //   Serial.println("Started Serial");
-  // }
+  PT_INIT(&pt3);
+  PT_INIT(&pt4);
+  startRGB();    // runs a quick method that sets up neopixel with necessary variables
+  startSlider(sliderFunction);  // declares the use case of the slider/linear potentiometer, not really used yet
+  bluemicro_hid.setBLEModel("SenseBoard_MK0.7");  // sets name to publish on bluetooth
+  bluemicro_hid.setHIDMessageDelay(10);  // delay in HID polling, can be lowered but 10 is a stable middleground in some worst case scenarios for example in a crowded bluetooth space
+  bluemicro_hid.begin();  // calls a function to start the library and make the device visible on bluetooth signals as well as connect to USB device if connected
 }
 
 void loop() {
-  //  Protothreads, ILY Dunkels
-  protothreadSwitch(&pt1);
-  protothreadExtras(&pt2);
-  protothreadSlider(&pt3);
-  protothreadRGB(&pt4);
+  //  Protothreads
+  protothreadSwitch(&pt1); // calls the switchThread first
+  protothreadExtras(&pt2);  // then the extras thread
+  protothreadSlider(&pt3);  // then Slider
+  protothreadRGB(&pt4);  // and RGB, This ir ordered in priority, so basic keyboard functions go first, then extras (currently has no functions but some nice calculations and connectivity features are in sight), then the slider, and finally RGB as its least important to make the keyboard functional
 }
