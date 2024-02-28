@@ -1,4 +1,4 @@
-void startSlider(int value){
+void startSlider(int value){  // this is currently not doing anything else than setting true or false to some variables, its planned later to use these variables to specify the function of the slider according to their name
   if (value == 1){
     sliderVolume = true;
     sliderBrightness = false;
@@ -19,10 +19,6 @@ void startSlider(int value){
 
 int static protothreadSlider(struct pt* pt) {
   PT_BEGIN(pt);
-
-  if (mux = 3 && muxChannel == 6){
-    
-  }
 
   PT_END(pt);
 }
