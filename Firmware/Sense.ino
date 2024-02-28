@@ -1,4 +1,4 @@
-#include <protothreads.h>
+#include <protothreads.h>  // includes some libraries
 //#include <BLE52_Mouse_and_Keyboard.h>
 #include <bluemicro_hid.h>
 //#include <Microsoft_HidForWindows.h>
