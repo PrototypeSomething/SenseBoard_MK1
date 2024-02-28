@@ -1,7 +1,8 @@
-// #include "class/hid/hid_device.h"
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>  // apparently includes neopixel here, I had an error about a year or so ago that made me put this here and it worked out fine, I don't remember what triggered this
 
-void readSwitch(uint8_t switchToRead) {
+void readSwitch(uint8_t switchToRead) {  // function to read the correct switch depending on input value
+  //first translates the input value to 4 bit, then writes those 4 bits to multiplexer select pins
+  //if statements to read the correct multiplexer depending on which mux the selected switch/switchToRead is located on (16 channels per mux and 5 muxes, the rest should be self explanatory)
 
   digitalWrite(6, bitRead(switchToRead, 0));  //Write the translated bit to the correct select-channel on the MUX'es
   digitalWrite(7, bitRead(switchToRead, 1));
@@ -9,11 +10,11 @@ void readSwitch(uint8_t switchToRead) {
   digitalWrite(9, bitRead(switchToRead, 3));
 
   if (switchToRead >= 0 && switchToRead <= 15) {
-    mux = 0;
-    muxChannel = switchToRead;
-    switchValue = analogRead(0);
+    mux = 0;  // Sets mux to the one being read
+    muxChannel = switchToRead;  // sets channel to the one being read on
+    switchValue = analogRead(0);  // sets switchValue to current analoge value of the switch being read
 
-    if (debug) {
+    if (debug) {  // I'm sorry for the mess with these blocks of serial print lines, as ive said, I wrote this over a year ago and was not very good at this stuff at the time, will clean up in the future
       Serial.print(bitRead(switchToRead, 3));
       Serial.print(bitRead(switchToRead, 2));
       Serial.print(bitRead(switchToRead, 1));
@@ -78,31 +79,17 @@ void readSwitch(uint8_t switchToRead) {
   }
 }
 
-void switchMap() {
+void switchMap() {  // maps value of how far down a switch is pressed
   mappedSwitchValue = map(switchValue, switchValues[mux][muxChannel][0], switchValues[mux][muxChannel][1], 0, 100);
 }
 
-void switchCalibration() {
-  while (switchValues[mux][muxChannel][0] > (switchValue - 50)) {
-    switchValues[mux][muxChannel][0]--;
-    Serial.println("switchVal-");
+void switchCalibration() {  // function to calibrate switch min and max values
+  if (switchValues[mux][muxChannel][0] > (switchValue + 50)) {
+    switchValues[mux][muxChannel][0] = switchValue + 50;
+    Serial.println(switchValue);
   }
-  while (switchValues[mux][muxChannel][1] < (switchValue + 50)) {
-    switchValues[mux][muxChannel][1]++;
-    Serial.println("switchVal+");
+  if (switchValues[mux][muxChannel][1] < (switchValue - 50)) {
+    switchValues[mux][muxChannel][1] = switchValue - 50;
+    Serial.println(switchValue);
   }
 }
-
-// void calibration(uint8_t mux, uint8_t muxChannel, uint8_t switchValue) {  //FEL
-//   while (switchValue < switchValues[mux][muxChannel][0]) {
-//     switchValues[mux][muxChannel][0]--;
-//     /*Serial.println();
-//     Serial.print(switchValues[mux][muxChannel][0]);
-//     Serial.print("          ");
-//     Serial.print(mux);
-//     Serial.print(muxChannel);*/
-//   }
-//   while (switchValue > switchValues[mux][muxChannel][1]) {
-//     switchValues[mux][muxChannel][1]++;
-//   }
-// }
