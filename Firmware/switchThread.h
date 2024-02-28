@@ -1,5 +1,5 @@
 int static protothreadSwitch(struct pt* pt) {  // declares the protothread
-  PT_BEGIN(pt);  // chooses which thread to use
+  PT_BEGIN(pt);  // chooses thread to use, from above statement, declared when thread is called in sense.ino
 
   
   modifier = 0;  // sets modifier (ctrl, shift, alt, etc) to 0, used in keyboard report down the line
